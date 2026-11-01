@@ -30,31 +30,31 @@
     personaPrefix: ""
     personaSuffix: Your working directory is {{cwd}}.
 
+# 本体只改已入队条目的 inject/config，不在这里 insert：
+# 用户层 profile/cordis.patch.yml 已有同名 dsh-purge 条目，
+# 再 insert 一次会让宿主报 `already queued: dsh-purge`（上游 1.1.75 才修）。
 - id: dsh-purge
+  name: dsh-purge
   inject: [systemPrompt, tools]
+  config:
+    enabled: true
+    autoApplyOnStart: false
+    autoUpdateOnStart: false
+    autoRevertOnMissing: false
+    injectOnce: false
+    stripMnemon: true
+    verbose: false
+    postPrompt: ""
+    postPromptOrder: 5100
+    autoRetry: true
+    retryMax: 3
+    autoContinue: false
+    continueMax: 3
+    continueText: "继续"
+    capabilityProtocol: true
+    hooksDenyBypass: true
 
 - insert:
-    - id: dsh-purge
-      name: 'dsh-purge'
-      inject: [systemPrompt, tools]
-      config:
-        enabled: true
-        autoApplyOnStart: false
-        autoUpdateOnStart: false
-        autoRevertOnMissing: false
-        injectOnce: false
-        stripMnemon: true
-        verbose: false
-        postPrompt: ""
-        postPromptOrder: 5100
-        autoRetry: true
-        retryMax: 3
-        autoContinue: false
-        continueMax: 3
-        continueText: "继续"
-        capabilityProtocol: true
-        hooksDenyBypass: true
-
     # 演练台：预设 + 技能落地（本插件 lib/redteam）
     - id: dsh-purge-redteam
       name: dsh-purge/redteam
