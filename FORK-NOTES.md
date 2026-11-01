@@ -13,9 +13,9 @@
    对演练台而言这是功能性倒退。
 2. 1.1.71 的补丁面最小（82 条 vs 1.1.86 的 85 条），需要打补丁的宿主点位最少。
 3. 宿主是 0.2.1-rc.5；1.1.80 的发布说明明确写「0.2.1-rc.3 及更新的 rc 不支持」，
-   之后 1.1.83/1.1.84 才又补上 rc.4/rc.5 的适配。1.1.71 只需要补三处即可工作。
+   之后 1.1.83/1.1.84 才又补上 rc.4/rc.5 的适配。1.1.71 只需要补四处即可工作。
 
-## 一、修复 1.1.71 在宿主 0.2.1-rc.5 上的三个真实缺口
+## 一、修复 1.1.71 在宿主 0.2.1-rc.5 上的四个真实缺口
 
 ### 修复 A — `#40 COMPLETE_PROMPT_KEEP_INJECT` 命中不到 0.2.1 的 complete 收尾块
 
@@ -62,6 +62,13 @@ for (const m of HOST_FD)   hostFs[m] = (fd, ...a) => nodeFs[m](fd, ...a);  // fd
 
 修法：删掉 `- insert:` 下的本体条目，把 `inject` 与全部 `config` 挪到 `- id: dsh-purge`
 覆盖条目上（与上游 1.1.75+ 同形态）。演练台三条子行保留在原 `- insert:` 下。
+
+### 修复 D — 不再把 `{{cwd}}` 写入 persona 后缀
+
+DSH 0.2.1 起不再注册 `{{cwd}}` 提示词变量。1.1.71 的身份清洗会在运行时把
+`deployment:persona-suffix` 改回 `Your working directory is {{cwd}}.`，导致任何模型请求前
+提示词组装直接报未知变量。当前目录已经由必需的运行时上下文提供，因此本副本把这个后缀
+固定为空，避免重复声明并消除组装失败。
 
 ## 二、从 1.1.86 反向移植的功能
 
@@ -132,6 +139,7 @@ const r = core.applyReplacementsToText(real, p40, "system-prompt");
 [anchor] sections 末位 = dsh-purge:anchor，含 OPERATOR ANCHOR，二次装配仍只 1 份
 [anchor] anchorMode:"off" 与 enabled:false 均不出现锚点
 [anchor] isSubagentContext 判定 origin=subagent / 空 header / null 均正确
+[cwd] persona 后缀为空 / 输出不含 {{cwd}} = true
 ```
 
 **坑**：用 PowerShell 读 `app.asar` 数行号会与 Node 错位（换行符切分规则不同），
